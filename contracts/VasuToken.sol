@@ -12,19 +12,19 @@ contract VasuToken {
     mapping(address => uint256) public balanceOf;
     mapping(address => mapping(address => uint256)) public allowance;
 
-    function VasuToken(uint256 _initialSupply) public {
+    constructor(uint256 _initialSupply) public {
         balanceOf[msg.sender] = _initialSupply;
         totalSupply = _initialSupply;
     }
 
     function transfer(address _to, uint256 _value) public returns (bool success) {
-        if (balanceOf[msg.sender] < _value) throw;
-        if (_to == 0x0) throw; // Prevent transfer to 0x0 address
-    
+        require(balanceOf[msg.sender] >= _value);
+        require(_to != 0x0); // Prevent transfer to 0x0 address
+
         balanceOf[msg.sender] -= _value;
         balanceOf[_to] += _value;
 
-        Transfer(msg.sender, _to, _value); // Solidity 0.4.2 event syntax
+        Transfer(msg.sender, _to, _value);
         return true;
     }
 
@@ -35,9 +35,9 @@ contract VasuToken {
     }
 
     function transferFrom(address _from, address _to, uint256 _value) public returns (bool success) {
-        if (balanceOf[_from] < _value) throw;
-        if (allowance[_from][msg.sender] < _value) throw;
-        if (_to == 0x0) throw; // Prevent transfer to 0x0 address
+        require(balanceOf[_from] >= _value);
+        require(allowance[_from][msg.sender] >= _value);
+        require(_to != 0x0); // Prevent transfer to 0x0 address
 
         balanceOf[_from] -= _value;
         balanceOf[_to] += _value;
