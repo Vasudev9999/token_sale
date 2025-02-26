@@ -18,30 +18,26 @@ contract VasuToken {
     }
 
     function transfer(address _to, uint256 _value) public returns (bool success) {
-        if (balanceOf[msg.sender] < _value) {
-            throw; // Solidity 0.4.2 style
-        }
-
+        if (balanceOf[msg.sender] < _value) throw;
+        if (_to == 0x0) throw; // Prevent transfer to 0x0 address
+    
         balanceOf[msg.sender] -= _value;
         balanceOf[_to] += _value;
 
-        Transfer(msg.sender, _to, _value); // No 'emit' in Solidity 0.4.2
+        Transfer(msg.sender, _to, _value); // Solidity 0.4.2 event syntax
         return true;
     }
 
     function approve(address _spender, uint256 _value) public returns (bool success) {
         allowance[msg.sender][_spender] = _value;
-        Approval(msg.sender, _spender, _value); // Event without 'emit'
+        Approval(msg.sender, _spender, _value);
         return true;
     }
 
     function transferFrom(address _from, address _to, uint256 _value) public returns (bool success) {
-        if (balanceOf[_from] < _value) {
-            throw;
-        }
-        if (allowance[_from][msg.sender] < _value) {
-            throw;
-        }
+        if (balanceOf[_from] < _value) throw;
+        if (allowance[_from][msg.sender] < _value) throw;
+        if (_to == 0x0) throw; // Prevent transfer to 0x0 address
 
         balanceOf[_from] -= _value;
         balanceOf[_to] += _value;
